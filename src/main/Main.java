@@ -3,6 +3,7 @@ package main;
 import main.creating_thread_executor.Server;
 import main.creating_thread_executor.Task;
 import main.executors_that_returns_result.FactorialCalculator;
+import main.processing_all_task_from_multiple.Result;
 import main.processing_first_task_from_multiple.TaskValidator;
 import main.processing_first_task_from_multiple.UserValidator;
 
@@ -19,7 +20,41 @@ public class Main {
     public static void main(String[] args) {
         //creatingThreadExecutor();
         // executorThatRetursResultExample();
-        validatorExample();
+        //validatorExample();
+        processingAllTasks();
+    }
+
+    private static void processingAllTasks() {
+        ExecutorService executor = (ExecutorService) Executors.
+                newCachedThreadPool();
+
+        List<main.processing_all_task_from_multiple.Task> taskList = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            main.processing_all_task_from_multiple.Task task = new main.processing_all_task_from_multiple.Task(String.valueOf(i));
+            taskList.add(task);
+        }
+
+        List<Future<Result>> resultList = null;
+
+        try {
+            resultList = executor.invokeAll(taskList);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        executor.shutdown();
+
+        System.out.println("Main: Printing the results");
+        for (int i = 0; i < resultList.size(); i++) {
+            Future<Result> future = resultList.get(i);
+            try {
+                Result result = future.get();
+                System.out.println(result.getName() + ": " + result.
+                        getValue());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private static void validatorExample() {

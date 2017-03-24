@@ -1,6 +1,8 @@
 package main;
 
 import main.canceling_task_in_executor.CancelTask;
+import main.controling_rejected_tasks.RejectedTask;
+import main.controling_rejected_tasks.RejectedTaskController;
 import main.controling_task_finishing_in_executor.ExecutableTask;
 import main.controling_task_finishing_in_executor.ResultTask;
 import main.creating_thread_executor.Server;
@@ -33,9 +35,36 @@ public class Main {
         // periodicTasksExample();
         // cancelingTaskInExecutorExample();
         // controllingTaskFinishingInExecutorExample();
-        separatingLaunchingTaskAndProcessingResultExample();
+        //separatingLaunchingTaskAndProcessingResultExample();
+
+        controlingRejectedTask();
     }
 
+    private static void controlingRejectedTask() {
+        RejectedTaskController controller = new
+                RejectedTaskController();
+
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.
+                newCachedThreadPool();
+
+        executor.setRejectedExecutionHandler(controller);
+
+        System.out.printf("Main: Starting.\n");
+        for (int i = 0; i < 3; i++) {
+            RejectedTask task = new RejectedTask("Task" + i);
+            executor.submit(task);
+        }
+
+        System.out.printf("Main: Shutting down the Executor.\n");
+        executor.shutdown();
+
+        System.out.printf("Main: Sending another Task.\n");
+        Task task = new Task("RejectedTask");
+        executor.submit(task);
+
+        System.out.println("Main: End");
+        System.out.printf("Main: End.\n");
+    }
 
     private static void separatingLaunchingTaskAndProcessingResultExample() {
 

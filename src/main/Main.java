@@ -1,5 +1,6 @@
 package main;
 
+import main.canceling_task_in_executor.CancelTask;
 import main.creating_thread_executor.Server;
 import main.creating_thread_executor.Task;
 import main.executors_that_returns_result.FactorialCalculator;
@@ -25,7 +26,33 @@ public class Main {
         //validatorExample();
         // processingAllTasks();
         //scheduledExecutorTasks();
-        periodicTasksExample();
+        // periodicTasksExample();
+        cancelingTaskInExecutorExample();
+    }
+
+    private static void cancelingTaskInExecutorExample() {
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.
+                newCachedThreadPool();
+
+        CancelTask task = new CancelTask();
+
+        System.out.printf("Main: Executing the Task\n");
+        Future<String> result = executor.submit(task);
+
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.printf("Main: Canceling the Task\n");
+        result.cancel(true);
+
+        System.out.printf("Main: Canceled: %s\n", result.isCancelled());
+        System.out.printf("Main: Done: %s\n", result.isDone());
+
+        executor.shutdown();
+        System.out.printf("Main: The executor has finished\n");
     }
 
     private static void periodicTasksExample() {

@@ -3,6 +3,8 @@ package main;
 import main.creating_thread_executor.Server;
 import main.creating_thread_executor.Task;
 import main.executors_that_returns_result.FactorialCalculator;
+import main.processing_first_task_from_multiple.TaskValidator;
+import main.processing_first_task_from_multiple.UserValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +15,44 @@ import java.util.concurrent.*;
  * Created by G.Chalauri on 3/23/2017.
  */
 public class Main {
+
     public static void main(String[] args) {
         //creatingThreadExecutor();
-        executorThatRetursResultExample();
+        // executorThatRetursResultExample();
+        validatorExample();
+    }
+
+    private static void validatorExample() {
+        String username = "test";
+        String password = "test";
+
+        UserValidator ldapValidator = new UserValidator("LDAP");
+        UserValidator dbValidator = new UserValidator("DataBase");
+
+        TaskValidator ldapTask = new TaskValidator(ldapValidator,
+                username, password);
+        TaskValidator dbTask = new TaskValidator(dbValidator, username, password);
+
+        List<TaskValidator> taskList = new ArrayList<>();
+        taskList.add(ldapTask);
+        taskList.add(dbTask);
+
+        ExecutorService executor = (ExecutorService) Executors.
+                newCachedThreadPool();
+        String result;
+
+        try {
+            result = executor.invokeAny(taskList);
+            System.out.printf("Main: Result: %s\n", result);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        executor.shutdown();
+        System.out.printf("Main: End of the Execution\n");
+
     }
 
     private static void executorThatRetursResultExample() {

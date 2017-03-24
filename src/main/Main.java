@@ -6,6 +6,7 @@ import main.executors_that_returns_result.FactorialCalculator;
 import main.processing_all_task_from_multiple.Result;
 import main.processing_first_task_from_multiple.TaskValidator;
 import main.processing_first_task_from_multiple.UserValidator;
+import main.running_task_in_executor_periodically.PeriodicTask;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,7 +24,38 @@ public class Main {
         // executorThatRetursResultExample();
         //validatorExample();
         // processingAllTasks();
-        scheduledExecutorTasks();
+        //scheduledExecutorTasks();
+        periodicTasksExample();
+    }
+
+    private static void periodicTasksExample() {
+        ScheduledThreadPoolExecutor executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+        System.out.printf("Main: Starting at: %s\n", new Date());
+        PeriodicTask task = new PeriodicTask("TASK");
+
+        ScheduledFuture<?> result = executor.scheduleAtFixedRate(task,
+                1, 2, TimeUnit.SECONDS);
+
+        for (int i = 0; i < 10; i++) {
+            System.out.printf("Main: Delay: %d\n", result.
+                    getDelay(TimeUnit.MILLISECONDS));
+
+            try {
+                TimeUnit.MILLISECONDS.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        executor.shutdown();
+
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.printf("Main: Finished at: %s\n", new Date());
     }
 
     private static void scheduledExecutorTasks() {

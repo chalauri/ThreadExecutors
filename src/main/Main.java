@@ -8,6 +8,7 @@ import main.processing_first_task_from_multiple.TaskValidator;
 import main.processing_first_task_from_multiple.UserValidator;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
@@ -21,7 +22,28 @@ public class Main {
         //creatingThreadExecutor();
         // executorThatRetursResultExample();
         //validatorExample();
-        processingAllTasks();
+        // processingAllTasks();
+        scheduledExecutorTasks();
+    }
+
+    private static void scheduledExecutorTasks() {
+        ScheduledThreadPoolExecutor executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+
+        System.out.printf("Main: Starting at: %s\n", new Date());
+        for (int i = 0; i < 5; i++) {
+            main.scheduled_executor_tasks.Task task = new main.scheduled_executor_tasks.Task("Task " + i);
+            executor.schedule(task, i + 1, TimeUnit.SECONDS);
+        }
+
+        executor.shutdown();
+
+        try {
+            executor.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.printf("Main: Ends at: %s\n", new Date());
     }
 
     private static void processingAllTasks() {
